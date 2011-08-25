@@ -728,8 +728,9 @@ public class CCNode {
         transform(gl);
 
         if (children_ != null) {
+        	CCNode child;
         	for (int i=0; i<children_.size(); ++i) {
-        		CCNode child = children_.get(i);
+        		child = children_.get(i);
         		if (child.zOrder_ < 0) {
         			child.visit(gl);
         		} else
@@ -740,8 +741,9 @@ public class CCNode {
         draw(gl);
 
         if (children_ != null) {
+        	CCNode child;
         	for (int i=0; i<children_.size(); ++i) {
-        		CCNode child = children_.get(i);
+        		child = children_.get(i);
         		if (child.zOrder_ >= 0) {
         			child.visit(gl);
         		}

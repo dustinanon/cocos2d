@@ -16,8 +16,6 @@ import org.cocos2d.opengl.GLResourceHelper.Resource;
 import org.cocos2d.types.CGPoint;
 import org.cocos2d.types.CGRect;
 import org.cocos2d.types.ccBlendFunc;
-import org.cocos2d.utils.BufferProvider;
-import org.cocos2d.utils.FastFloatBuffer;
 
 import com.badlogic.gdx.utils.BufferUtils;
 
@@ -225,83 +223,52 @@ public class CCQuadParticleSystem extends CCParticleSystem implements Resource {
 		}
 	}
 
+	final float[] color = new float[4];
+	final float[] floats = new float[8];
 	@Override
 	public void updateQuad(CCParticle p, CGPoint newPos) {
 		// colors
+		int base;
 		for (int i=0; i<4; ++i) {
-//			colors.put(particleIdx * 16 + i*4 + 0, p.color.r);
-//			colors.put(particleIdx * 16 + i*4 + 1, p.color.g);
-//			colors.put(particleIdx * 16 + i*4 + 2, p.color.b);
-//			colors.put(particleIdx * 16 + i*4 + 3, p.color.a);
-			final int pos = particleIdx * 16 + i*4;
-			final float[] color = {p.color.r, p.color.g, p.color.b, p.color.a};
-			BufferUtils.copy(color, colors, pos);
+			base = particleIdx * 16 + i*4;
+			color[0] = p.color.r;
+			color[1] = p.color.g;
+			color[2] = p.color.b;
+			color[3] = p.color.a;
+			BufferUtils.copy(color, colors, base);
 		}
 
 		// vertices
-		float size_2 = p.size/2;
+		final float size_2 = p.size/2;
 		if( p.rotation != 0) {
-			float x1 = -size_2;
-			float y1 = -size_2;
-
-			float x2 = size_2;
-			float y2 = size_2;
 			float x = newPos.x;
 			float y = newPos.y;
 
 			float r = (float)- ccMacros.CC_DEGREES_TO_RADIANS(p.rotation);
 			float cr = (float) Math.cos(r);
 			float sr = (float) Math.sin(r);
-			float ax = x1 * cr - y1 * sr + x;
-			float ay = x1 * sr + y1 * cr + y;
-			float bx = x2 * cr - y1 * sr + x;
-			float by = x2 * sr + y1 * cr + y;
-			float cx = x2 * cr - y2 * sr + x;
-			float cy = x2 * sr + y2 * cr + y;
-			float dx = x1 * cr - y2 * sr + x;
-			float dy = x1 * sr + y2 * cr + y;
+			floats[0] = (-size_2) * cr - (-size_2) * sr + x;
+			floats[1] =	(-size_2) * sr + (-size_2) * cr + y;
+			floats[2] =	size_2 * cr - (-size_2) * sr + x;
+			floats[3] =	size_2 * sr + (-size_2) * cr + y;
+			floats[4] =	size_2 * cr - size_2 * sr + x;
+			floats[5] =	size_2 * sr + size_2 * cr + y;
+			floats[6] =	(-size_2) * cr - size_2 * sr + x;
+			floats[7] =	(-size_2) * sr + size_2 * cr + y;
 			
-			final int base = particleIdx * 8;
-//			// bottom-left vertex:
-//			vertices.put(base + 0, ax);
-//			vertices.put(base + 1, ay);
-//			
-//			// bottom-right vertex:
-//			vertices.put(base + 2, bx);
-//			vertices.put(base + 3, by);
-//			
-//			// top-left vertex:
-//			vertices.put(base + 4, dx);
-//			vertices.put(base + 5, dy);
-//			
-//			// top-right vertex:
-//			vertices.put(base + 6, cx);
-//			vertices.put(base + 7, cy);
-			
-			final float[] floats = {ax, ay, bx, by, dx, dy, cx, cy};
+			base = particleIdx * 8;
 			BufferUtils.copy(floats, vertices, base);
 		} else {
-			final int base = particleIdx * 8;
-//			// bottom-left vertex:
-//			vertices.put(base + 0, newPos.x - size_2);
-//			vertices.put(base + 1, newPos.y - size_2);
-//			
-//			// bottom-right vertex:
-//			vertices.put(base + 2, newPos.x + size_2);
-//			vertices.put(base + 3, newPos.y - size_2);
-//			
-//			// top-left vertex:
-//			vertices.put(base + 4, newPos.x - size_2);
-//			vertices.put(base + 5, newPos.y + size_2);
-//			
-//			// top-right vertex:
-//			vertices.put(base + 6, newPos.x + size_2);
-//			vertices.put(base + 7, newPos.y + size_2);
+			base = particleIdx * 8;
+			floats[0] = newPos.x - size_2;
+			floats[1] =	newPos.y - size_2;
+			floats[2] =	newPos.x + size_2;
+			floats[3] =	newPos.y - size_2;
+			floats[4] =	newPos.x - size_2;
+			floats[5] =	newPos.y + size_2;
+			floats[6] = newPos.x + size_2;
+			floats[7] =	newPos.y + size_2;
 			
-			final float[] floats = {newPos.x - size_2, newPos.y - size_2,
-									newPos.x + size_2, newPos.y - size_2,
-									newPos.x - size_2, newPos.y + size_2,
-									newPos.x + size_2, newPos.y + size_2};
 			BufferUtils.copy(floats, vertices, base);
 		}
 	}

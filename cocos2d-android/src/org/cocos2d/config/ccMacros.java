@@ -5,6 +5,7 @@ import javax.microedition.khronos.opengles.GL10;
 import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.opengl.CCGLSurfaceView;
 import org.cocos2d.opengl.GLSurfaceView;
+import org.cocos2d.utils.XORShiftRNG;
 
 import android.app.Activity;
 import android.util.Log;
@@ -30,6 +31,8 @@ public class ccMacros {
      *		CCLOGERROR() will be enabled
      *		CCLOGINFO()	will be enabled 
      */
+	private static final XORShiftRNG rand = new XORShiftRNG();
+	
     public static final void CCLOG(final String logName, final String logStr) {
         if (ccConfig.COCOS2D_DEBUG >= 1) {
             Log.d(logName, logStr);
@@ -59,14 +62,16 @@ public class ccMacros {
       returns a random float between -1 and 1
     */
     public static final float CCRANDOM_MINUS1_1() {
-        return (float) Math.random() * 2.0f - 1.0f;
+        //return (float) Math.random() * 2.0f - 1.0f;
+    	return rand.nextFloat() * 2.0f - 1.0f;
     }
 
     /** @def CCRANDOM_0_1
       returns a random float between 0 and 1
     */
     public static final float CCRANDOM_0_1() {
-        return (float) Math.random();
+        //return (float) Math.random();
+    	return rand.nextFloat();
     }
 
     /** @def M_PI_2

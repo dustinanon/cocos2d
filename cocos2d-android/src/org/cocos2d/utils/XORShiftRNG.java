@@ -19,11 +19,7 @@ public class XORShiftRNG extends Random {
 
     // Previously used an array for state but using separate fields proved to be
     // faster.
-    private int state1;
-    private int state2;
-    private int state3;
-    private int state4;
-    private int state5;
+	private int state1, state2, state3, state4, state5 = 0;
 
     private final byte[] seed;
 
@@ -126,17 +122,16 @@ public class XORShiftRNG extends Random {
      * {@inheritDoc}
      */
     @Override
-    protected int next(int bits)
+    protected int next(final int bits)
     {
-        int t = (state1 ^ (state1 >> 7));
+        final int t = (state1 ^ (state1 >> 7));
         state1 = state2;
         state2 = state3;
-        state3 = state4;
-        state4 = state5;
-        state5 = (state5 ^ (state5 << 6)) ^ (t ^ (t << 13));
-        int value = (state2 + state2 + 1) * state5;
-        return value >>> (32 - bits);
+//        state3 = state4;
+//        state4 = state5;
+//        state5 = (state5 ^ (state5 << 6)) ^ (t ^ (t << 13));
+//        return ((state2 + state2 + 1) * state5) >>> (32 - bits);
+        state3 = (state3 ^ (state3 << 6)) ^ (t ^ (t << 13));
+        return ((state2 + state2 + 1) * state3) >>> (32 - bits);
     }
-
-	
 }

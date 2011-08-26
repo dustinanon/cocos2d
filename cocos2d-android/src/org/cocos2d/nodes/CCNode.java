@@ -1016,9 +1016,9 @@ public class CCNode {
     /** Returns the local affine transform matrix
       @since v0.7.1
     */
+    private final static CGPoint zero = CGPoint.getZero();
     private CGAffineTransform nodeToParentTransform() {
         if (isTransformDirty_) {
-        	CGPoint zero = CGPoint.getZero();
             transform_.setToIdentity();
 
             if (!isRelativeAnchorPoint_ && !CGPoint.equalToPoint(anchorPointInPixels_, zero)) {
@@ -1032,10 +1032,9 @@ public class CCNode {
             	transform_.rotate(-ccMacros.CC_DEGREES_TO_RADIANS(rotation_));
             
             if (skewX_ != 0 || skewY_ != 0) {
-            	/** create a skewed coordinate system */
-            	CGAffineTransform skew = CGAffineTransform.make(1.0f, MathLib.tan(ccMacros.CC_DEGREES_TO_RADIANS(skewY_)), MathLib.tan(ccMacros.CC_DEGREES_TO_RADIANS(skewX_)), 1.0f, 0.0f, 0.0f);
-            	/** apply the skew to the transform */
-            	transform_ = transform_.getTransformConcat(skew);
+            	/** create a skewed coordinate system and
+            	    apply the skew to the transform */
+            	transform_ = transform_.getTransformConcat(CGAffineTransform.make(1.0f, MathLib.tan(ccMacros.CC_DEGREES_TO_RADIANS(skewY_)), MathLib.tan(ccMacros.CC_DEGREES_TO_RADIANS(skewX_)), 1.0f, 0.0f, 0.0f));
             }
             
             if( ! (scaleX_ == 1 && scaleY_ == 1) ) 
@@ -1104,15 +1103,15 @@ public class CCNode {
       @since v0.7.1
     */
     public CGPoint convertToNodeSpace(float x, float y) {
-        OneClassPool<CGAffineTransform> pool = PoolHolder.getInstance().getCGAffineTransformPool();
-        
-        CGAffineTransform temp = pool.get();
+//        OneClassPool<CGAffineTransform> pool = PoolHolder.getInstance().getCGAffineTransformPool();
+//        
+//        CGAffineTransform temp = pool.get();
         worldToNodeTransform(temp);
         
         CGPoint ret = new CGPoint();
     	CGPointUtil.applyAffineTransform(x, y, temp, ret);
     	
-        pool.free(temp);
+//        pool.free(temp);
         return ret;
     }
     
@@ -1134,14 +1133,14 @@ public class CCNode {
      * This is analog method, result is written to ret. No garbage.
      */
     public void convertToNodeSpace(float x, float y, CGPoint ret) {
-        OneClassPool<CGAffineTransform> pool = PoolHolder.getInstance().getCGAffineTransformPool();
-        
-        CGAffineTransform temp = pool.get();
+//        OneClassPool<CGAffineTransform> pool = PoolHolder.getInstance().getCGAffineTransformPool();
+//        
+//        CGAffineTransform temp = pool.get();
         worldToNodeTransform(temp);
         
         CGPointUtil.applyAffineTransform(x, y, temp, ret);
         
-        pool.free(temp);
+//        pool.free(temp);
     }
 
     /** converts local coordinate to world space
@@ -1155,15 +1154,16 @@ public class CCNode {
     /**
      * This is analog method, result is written to ret. No garbage.
      */
+    CGAffineTransform temp = new CGAffineTransform();
     public void convertToWorldSpace(float x, float y , CGPoint ret) {
-        OneClassPool<CGAffineTransform> pool = PoolHolder.getInstance().getCGAffineTransformPool();
+        //OneClassPool<CGAffineTransform> pool = PoolHolder.getInstance().getCGAffineTransformPool();
         
-        CGAffineTransform temp = pool.get();
+        // = pool.get();
         nodeToWorldTransform(temp);
         
         CGPointUtil.applyAffineTransform(x, y, temp, ret);
         
-        pool.free(temp);
+        //pool.free(temp);
     }
     
     /** converts a world coordinate to local coordinate

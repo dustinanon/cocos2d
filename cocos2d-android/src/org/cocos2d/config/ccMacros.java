@@ -5,7 +5,7 @@ import javax.microedition.khronos.opengles.GL10;
 import org.cocos2d.nodes.CCDirector;
 import org.cocos2d.opengl.CCGLSurfaceView;
 import org.cocos2d.opengl.GLSurfaceView;
-import org.cocos2d.utils.XORShiftRNG;
+import org.cocos2d.utils.GameRand;
 
 import android.app.Activity;
 import android.util.Log;
@@ -31,7 +31,8 @@ public class ccMacros {
      *		CCLOGERROR() will be enabled
      *		CCLOGINFO()	will be enabled 
      */
-	private static final XORShiftRNG rand = new XORShiftRNG();
+	//private static final XORShiftRNG rand = new XORShiftRNG();
+	private static final GameRand rand = new GameRand();
 	
     public static final void CCLOG(final String logName, final String logStr) {
         if (ccConfig.COCOS2D_DEBUG >= 1) {

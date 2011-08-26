@@ -223,30 +223,37 @@ public class CCQuadParticleSystem extends CCParticleSystem implements Resource {
 		}
 	}
 
-	final float[] color = new float[4];
+	//final float[] color = new float[4];
+	final float[] color = new float[16];
 	final float[] floats = new float[8];
+	int base;
+	float size_2, x, y, r, cr, sr; 
 	@Override
 	public void updateQuad(CCParticle p, CGPoint newPos) {
 		// colors
-		int base;
-		for (int i=0; i<4; ++i) {
-			base = particleIdx * 16 + i*4;
-			color[0] = p.color.r;
-			color[1] = p.color.g;
-			color[2] = p.color.b;
-			color[3] = p.color.a;
-			BufferUtils.copy(color, colors, base);
-		}
+		/** there's no need to make these assignments every time,
+		 *  so I just pulled them out of the loop;
+		 */
+		color[0] = color[4] = color[8] = color[12] = p.color.r;
+		color[1] = color[5] = color[9] = color[13] = p.color.g;
+		color[2] = color[6] = color[10] = color[14]= p.color.b;
+		color[3] = color[7] = color[11] = color[15]= p.color.a;
+		//for (int i=0; i<4; ++i)
+		//base = particleIdx * 16;
+		BufferUtils.copy(color, colors, particleIdx * 16);
+//		BufferUtils.copy(color, colors, base + 4);
+//		BufferUtils.copy(color, colors, base + 8);
+//		BufferUtils.copy(color, colors, base + 12);
 
 		// vertices
-		final float size_2 = p.size/2;
+		size_2 = p.size/2;
+		//base = particleIdx * 8;
+		x = newPos.x;
+		y = newPos.y;
 		if( p.rotation != 0) {
-			float x = newPos.x;
-			float y = newPos.y;
-
-			float r = (float)- ccMacros.CC_DEGREES_TO_RADIANS(p.rotation);
-			float cr = (float) Math.cos(r);
-			float sr = (float) Math.sin(r);
+			r = (float)- ccMacros.CC_DEGREES_TO_RADIANS(p.rotation);
+			cr = (float) Math.cos(r);
+			sr = (float) Math.sin(r);
 			floats[0] = (-size_2) * cr - (-size_2) * sr + x;
 			floats[1] =	(-size_2) * sr + (-size_2) * cr + y;
 			floats[2] =	size_2 * cr - (-size_2) * sr + x;
@@ -255,22 +262,18 @@ public class CCQuadParticleSystem extends CCParticleSystem implements Resource {
 			floats[5] =	size_2 * sr + size_2 * cr + y;
 			floats[6] =	(-size_2) * cr - size_2 * sr + x;
 			floats[7] =	(-size_2) * sr + size_2 * cr + y;
-			
-			base = particleIdx * 8;
-			BufferUtils.copy(floats, vertices, base);
 		} else {
-			base = particleIdx * 8;
-			floats[0] = newPos.x - size_2;
-			floats[1] =	newPos.y - size_2;
-			floats[2] =	newPos.x + size_2;
-			floats[3] =	newPos.y - size_2;
-			floats[4] =	newPos.x - size_2;
-			floats[5] =	newPos.y + size_2;
-			floats[6] = newPos.x + size_2;
-			floats[7] =	newPos.y + size_2;
-			
-			BufferUtils.copy(floats, vertices, base);
+			floats[0] = x - size_2;
+			floats[1] =	y - size_2;
+			floats[2] =	x + size_2;
+			floats[3] =	y - size_2;
+			floats[4] =	x - size_2;
+			floats[5] =	y + size_2;
+			floats[6] = x + size_2;
+			floats[7] =	y + size_2;			
 		}
+		
+		BufferUtils.copy(floats, vertices, particleIdx * 8);
 	}
 
 	@Override

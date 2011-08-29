@@ -215,6 +215,10 @@ public class CCNode {
         return CGPoint.make(anchorPointInPixels_.x, anchorPointInPixels_.y);
     }
     
+    public CGPoint getAnchorPointInPixelsRef() {
+    	return anchorPointInPixels_;
+    }
+    
 	// If YES the transformtions will be relative to (-transform.x, -transform.y).
 	// Sprites, Labels and any other "small" object uses it.
 	// Scenes, Layers and other "whole screen" object don't use it.
@@ -713,6 +717,7 @@ public class CCNode {
     /**
       recursive method that visit its children and draw them
     */
+    CCNode child;
     public void visit(GL10 gl) {
 	    // quick return if not visible
         if (!visible_)
@@ -728,7 +733,6 @@ public class CCNode {
         transform(gl);
 
         if (children_ != null) {
-        	CCNode child;
         	for (int i=0; i<children_.size(); ++i) {
         		child = children_.get(i);
         		if (child.zOrder_ < 0) {
@@ -741,7 +745,6 @@ public class CCNode {
         draw(gl);
 
         if (children_ != null) {
-        	CCNode child;
         	for (int i=0; i<children_.size(); ++i) {
         		child = children_.get(i);
         		if (child.zOrder_ >= 0) {

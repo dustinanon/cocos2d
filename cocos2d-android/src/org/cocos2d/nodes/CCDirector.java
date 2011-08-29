@@ -767,6 +767,10 @@ public class CCDirector implements GLSurfaceView.Renderer {
         return CGSize.make(surfaceSize_.width, surfaceSize_.height);
     }
     
+    public CGSize displaySizeRef() {
+    	return surfaceSize_;
+    }
+    
     public boolean getLandscape() {
         return deviceOrientation_ == kCCDeviceOrientationLandscapeLeft;
     }

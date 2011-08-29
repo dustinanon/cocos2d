@@ -25,6 +25,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
+import java.util.Arrays;
 
 /** Class with static helper methods to increase the speed of array/direct buffer and direct buffer/direct buffer transfers
  * 
@@ -150,6 +151,12 @@ public class BufferUtils {
         
         public static void copy (float[] src, Buffer dst, int dstPosition) {
         		copyJni(src, 0, dst, dstPosition << 2, src.length << 2);
+        }
+        
+        public static void fillWithValue (float val, Buffer dst, int dstPosition, int numElements) {
+        	final float[] vals = new float[numElements];
+        	Arrays.fill(vals, val);
+        	copy(vals, dst, dstPosition);
         }
         
         /** Copies the contents of src to dst, starting from src[srcOffset], copying numElements elements. The {@link Buffer} instance's

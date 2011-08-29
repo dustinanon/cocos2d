@@ -19,4 +19,11 @@ public class GameRand extends Random {
 		
 		return high >>> (32 - bits);
 	}
+	
+	
+	private static float fdiv = (float)(1<<24);
+	@Override
+	public float nextFloat() {
+		return next(24) / fdiv;
+	}
 }

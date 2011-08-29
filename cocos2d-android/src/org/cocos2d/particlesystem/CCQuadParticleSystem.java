@@ -43,6 +43,9 @@ public class CCQuadParticleSystem extends CCParticleSystem implements Resource {
 	FloatBuffer			vertices;
 	FloatBuffer			colors;
 
+	final float[] color;
+	final float[] floats;
+	
 	ShortBuffer			indices;	// indices
 	int					quadsIDs[];	// VBO id
 	public static final int QuadSize = 3;
@@ -61,6 +64,8 @@ public class CCQuadParticleSystem extends CCParticleSystem implements Resource {
 		texCoords	= BufferUtils.newFloatBuffer(4 * 2 * totalParticles);
 		vertices	= BufferUtils.newFloatBuffer(4 * 2 * totalParticles);
 		colors		= BufferUtils.newFloatBuffer(4 * 4 * totalParticles);
+		color 		= new float[colors.limit()];
+		floats		= new float[vertices.limit()];
 		
 		//indices = BufferProvider.createShortBuffer(totalParticles * 6 );
 		indices 	= BufferUtils.newShortBuffer(totalParticles * 6);
@@ -223,61 +228,55 @@ public class CCQuadParticleSystem extends CCParticleSystem implements Resource {
 		}
 	}
 
-	//final float[] color = new float[4];
-	final float[] color = new float[16];
-	final float[] floats = new float[8];
+	//final float[] color = new float[4]
 	int base;
 	float size_2, x, y, r, cr, sr; 
 	@Override
-	public void updateQuad(CCParticle p, CGPoint newPos) {
+	public void updateQuad(final CCParticle p, final CGPoint newPos) {
 		// colors
+		base = particleIdx * 16;
 		/** there's no need to make these assignments every time,
 		 *  so I just pulled them out of the loop;
 		 */
-		color[0] = color[4] = color[8] = color[12] = p.color.r;
-		color[1] = color[5] = color[9] = color[13] = p.color.g;
-		color[2] = color[6] = color[10] = color[14]= p.color.b;
-		color[3] = color[7] = color[11] = color[15]= p.color.a;
-		//for (int i=0; i<4; ++i)
-		//base = particleIdx * 16;
-		BufferUtils.copy(color, colors, particleIdx * 16);
-//		BufferUtils.copy(color, colors, base + 4);
-//		BufferUtils.copy(color, colors, base + 8);
-//		BufferUtils.copy(color, colors, base + 12);
+		color[base + 0] = color[base + 4] = color[base + 8] = color[base + 12] = p.color.r;
+		color[base + 1] = color[base + 5] = color[base + 9] = color[base + 13] = p.color.g;
+		color[base + 2] = color[base + 6] = color[base + 10] = color[base + 14]= p.color.b;
+		color[base + 3] = color[base + 7] = color[base + 11] = color[base + 15]= p.color.a;
 
 		// vertices
 		size_2 = p.size/2;
-		//base = particleIdx * 8;
+		base /= 2;
 		x = newPos.x;
 		y = newPos.y;
 		if( p.rotation != 0) {
 			r = (float)- ccMacros.CC_DEGREES_TO_RADIANS(p.rotation);
-			cr = (float) Math.cos(r);
-			sr = (float) Math.sin(r);
-			floats[0] = (-size_2) * cr - (-size_2) * sr + x;
-			floats[1] =	(-size_2) * sr + (-size_2) * cr + y;
-			floats[2] =	size_2 * cr - (-size_2) * sr + x;
-			floats[3] =	size_2 * sr + (-size_2) * cr + y;
-			floats[4] =	size_2 * cr - size_2 * sr + x;
-			floats[5] =	size_2 * sr + size_2 * cr + y;
-			floats[6] =	(-size_2) * cr - size_2 * sr + x;
-			floats[7] =	(-size_2) * sr + size_2 * cr + y;
+			cr = (float) Math.cos(r) * size_2;
+			sr = (float) Math.sin(r) * size_2;
+			floats[base + 0] =  (-cr) - (-sr) + x;
+			floats[base + 1] =  (-sr) + (-cr) + y;
+			floats[base + 2] =	cr - (-sr) + x;
+			floats[base + 3] =	sr + (-cr) + y;
+			floats[base + 4] =	cr - sr + x;
+			floats[base + 5] =	sr + cr + y;
+			floats[base + 6] =	(-cr) - sr + x;
+			floats[base + 7] =	(-sr) + cr + y;
 		} else {
-			floats[0] = x - size_2;
-			floats[1] =	y - size_2;
-			floats[2] =	x + size_2;
-			floats[3] =	y - size_2;
-			floats[4] =	x - size_2;
-			floats[5] =	y + size_2;
-			floats[6] = x + size_2;
-			floats[7] =	y + size_2;			
+			floats[base + 0] = x - size_2;
+			floats[base + 1] =	y - size_2;
+			floats[base + 2] =	x + size_2;
+			floats[base + 3] =	y - size_2;
+			floats[base + 4] =	x - size_2;
+			floats[base + 5] =	y + size_2;
+			floats[base + 6] = x + size_2;
+			floats[base + 7] =	y + size_2;			
 		}
-		
-		BufferUtils.copy(floats, vertices, particleIdx * 8);
 	}
 
 	@Override
 	public void postStep(){
+		BufferUtils.copy(floats, vertices, 0);
+		BufferUtils.copy(color, colors, 0);
+		
 		GL11 gl = (GL11)CCDirector.gl;
 
 		// for texCoords
@@ -297,13 +296,15 @@ public class CCQuadParticleSystem extends CCParticleSystem implements Resource {
 	}
 
 	// overriding draw method
+	GL11 gl;
+	boolean newBlend = false;
 	@Override
 	public void draw(GL10 gle)
 	{
 		// Default GL states: GL_TEXTURE_2D, GL_VERTEX_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
 		// Needed states: GL_TEXTURE_2D, GL_VERTEX_ARRAY, GL_COLOR_ARRAY, GL_TEXTURE_COORD_ARRAY
 		// Unneeded states: -
-		GL11 gl = (GL11)gle;
+		gl = (GL11)gle;
 
 		gl.glBindTexture(GL11.GL_TEXTURE_2D, texture.name());
 		// for texCoords
@@ -321,7 +322,7 @@ public class CCQuadParticleSystem extends CCParticleSystem implements Resource {
 		gl.glColorPointer(4, GL11.GL_FLOAT, 0, 0);
 		// gl.glColorPointer(4, GL11.GL_FLOAT, 0, colors);
 		
-		boolean newBlend = false;
+		newBlend = false;
 		if( blendFunc.src != ccConfig.CC_BLEND_SRC || blendFunc.dst != ccConfig.CC_BLEND_DST ) {
 			newBlend = true;
 			gl.glBlendFunc( blendFunc.src, blendFunc.dst );

@@ -79,20 +79,20 @@ public class ccMacros {
             Math.PI divided by 2
     */
     public static final float M_PI_2 = (float)(Math.PI / 2);
-    
+    public static final float M_PI = (float)Math.PI;
 
     /** @def CC_DEGREES_TO_RADIANS
         converts degrees to radians
     */
-    public static final float CC_DEGREES_TO_RADIANS(float angle) {
-        return (angle / 180.0f * (float) Math.PI);
+    public static final float CC_DEGREES_TO_RADIANS(final float angle) {
+        return (angle / 180.0f * M_PI);
     }
 
     /** @def CC_RADIANS_TO_DEGREES
         converts radians to degrees
     */
-    public static final float CC_RADIANS_TO_DEGREES(float angle) {
-        return (angle / (float) Math.PI * 180.0f);
+    public static final float CC_RADIANS_TO_DEGREES(final float angle) {
+        return (angle / M_PI * 180.0f);
     }
 
     /** @def CC_ENABLE_DEFAULT_GL_STATES
